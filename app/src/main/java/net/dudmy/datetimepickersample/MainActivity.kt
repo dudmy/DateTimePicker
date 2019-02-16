@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener,
         view_sample.apply {
             setMinDate(minDate)
             setMaxDate(maxDate)
+            setHourInterval(2)
+            setMinuteInterval(15)
             setDividerColor(Color.BLUE)
             setDividerHeight(10)
             setOnDateTimeChangeListener(this@MainActivity)

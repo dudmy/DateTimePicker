@@ -31,7 +31,3 @@ internal fun getClearDate(date: Long): Date {
     calendar.clear(Calendar.MILLISECOND)
     return calendar.time
 }
-
-internal fun getCurrentHour(): Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
-internal fun getCurrentMinute(): Int = Calendar.getInstance().get(Calendar.MINUTE)

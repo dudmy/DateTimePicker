@@ -1,11 +1,13 @@
 package net.dudmy.datetimepicker
 
 import android.content.Context
+import android.os.Build
 import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.NumberPicker
+import android.widget.TimePicker
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,7 +16,8 @@ class DateTimePicker @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), NumberPicker.OnValueChangeListener {
+) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), NumberPicker.OnValueChangeListener,
+    TimePicker.OnTimeChangedListener {
 
     private var minDate: Long = addWeeks(System.currentTimeMillis(), -1)
     private var maxDate: Long = addWeeks(System.currentTimeMillis(), 1)
@@ -23,21 +26,17 @@ class DateTimePicker @JvmOverloads constructor(
     private val datePicker: NumberPicker by lazy {
         findViewById<NumberPicker>(R.id.date_picker)
     }
-    private val hourPicker: NumberPicker by lazy {
-        findViewById<NumberPicker>(R.id.hour_picker)
-    }
-    private val minutePicker: NumberPicker by lazy {
-        findViewById<NumberPicker>(R.id.minute_picker)
+    private val timePicker: IntervalTimePicker by lazy {
+        findViewById<IntervalTimePicker>(R.id.time_picker)
     }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.datetime_picker_layout, this)
-        initDatePicker()
-        initHourPicker()
-        initMinutePicker()
     }
 
-    private fun initDatePicker() {
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
         val daysDiff = getDaysDiff(minDate, maxDate)
         val displayedDates = mutableListOf<String>()
         var date = minDate
@@ -59,26 +58,8 @@ class DateTimePicker @JvmOverloads constructor(
             wrapSelectorWheel = false
             setOnValueChangedListener(this@DateTimePicker)
         }
-    }
 
-    private fun initHourPicker() {
-        hourPicker.apply {
-            minValue = 0
-            maxValue = 23
-            value = getCurrentHour()
-            wrapSelectorWheel = false
-            setOnValueChangedListener(this@DateTimePicker)
-        }
-    }
-
-    private fun initMinutePicker() {
-        minutePicker.apply {
-            minValue = 0
-            maxValue = 59
-            value = getCurrentMinute()
-            wrapSelectorWheel = false
-            setOnValueChangedListener(this@DateTimePicker)
-        }
+        timePicker.setOnTimeChangedListener(this)
     }
 
     /**
@@ -88,7 +69,6 @@ class DateTimePicker @JvmOverloads constructor(
      */
     fun setMinDate(minDate: Long) {
         this.minDate = minDate
-        initDatePicker()
     }
 
     /**
@@ -105,7 +85,6 @@ class DateTimePicker @JvmOverloads constructor(
      */
     fun setMaxDate(maxDate: Long) {
         this.maxDate = maxDate
-        initDatePicker()
     }
 
     /**
@@ -133,12 +112,34 @@ class DateTimePicker @JvmOverloads constructor(
     /**
      * @return The selected hour, in the range (0-23)
      */
-    fun getHour(): Int = hourPicker.value
+    fun getHour(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        timePicker.hour
+    } else {
+        timePicker.currentHour
+    }
 
     /**
      * @return The selected minute, in the range (0-59)
      */
-    fun getMinute(): Int = minutePicker.value
+    fun getMinute(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        timePicker.minute
+    } else {
+        timePicker.currentMinute
+    }
+
+    /**
+     * Sets the hours interval.
+     */
+    fun setHourInterval(interval: Int) {
+        timePicker.setHourInterval(interval)
+    }
+
+    /**
+     * Sets the minutes interval.
+     */
+    fun setMinuteInterval(interval: Int) {
+        timePicker.setMinuteInterval(interval)
+    }
 
     fun setOnDateTimeChangeListener(onDateTimeChangeListener: OnDateTimeChangeListener) {
         this.onDateTimeChangeListener = onDateTimeChangeListener
@@ -149,8 +150,7 @@ class DateTimePicker @JvmOverloads constructor(
      */
     fun setDividerColor(@ColorInt color: Int) {
         datePicker.setDividerColor(color)
-        hourPicker.setDividerColor(color)
-        minutePicker.setDividerColor(color)
+        timePicker.setDividerColor(color)
     }
 
     /**
@@ -158,8 +158,7 @@ class DateTimePicker @JvmOverloads constructor(
      */
     fun setDividerHeight(height: Int) {
         datePicker.setDividerHeight(height)
-        hourPicker.setDividerHeight(height)
-        minutePicker.setDividerHeight(height)
+        timePicker.setDividerHeight(height)
     }
 
     /**
@@ -167,8 +166,7 @@ class DateTimePicker @JvmOverloads constructor(
      */
     fun setMaxHeight(height: Int) {
         datePicker.setMaxHeight(height)
-        hourPicker.setMaxHeight(height)
-        minutePicker.setMaxHeight(height)
+        timePicker.setMaxHeight(height)
     }
 
     private fun getSelectedDate(): Calendar = Calendar.getInstance().apply {
@@ -179,6 +177,18 @@ class DateTimePicker @JvmOverloads constructor(
 
     override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
         if (picker == null) return
+
+        onDateTimeChangeListener?.onDateTimeChanged(
+            getYear(),
+            getMonth(),
+            getDayOfMonth(),
+            getHour(),
+            getMinute()
+        )
+    }
+
+    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        if (view == null) return
 
         onDateTimeChangeListener?.onDateTimeChanged(
             getYear(),
