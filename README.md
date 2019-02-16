@@ -13,7 +13,7 @@ Add a dependency to `build.gradle`.
 
 ```groovy
 dependiencies {
-    implementation 'net.dudmy:datetimepicker:1.0.0'
+    implementation 'net.dudmy:datetimepicker:1.0.1'
 }
 ```
 
@@ -29,6 +29,7 @@ Use as shown below, or refer to the sample code provided [here](https://github.c
 val dateTimePicker = DateTimePicker(it.context)
 dateTimePicker.setMinDate(minDate)
 dateTimePicker.setMaxDate(maxDate)
+// ...
 dateTimePicker.setOnDateTimeChangeListener(object : OnDateTimeChangeListener {
     override fun onDateTimeChanged(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
         // do something.
