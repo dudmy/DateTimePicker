@@ -2,12 +2,12 @@ package net.dudmy.datetimepicker
 
 import android.content.Context
 import android.os.Build
-import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.NumberPicker
 import android.widget.TimePicker
+import androidx.annotation.ColorInt
 import java.text.SimpleDateFormat
 import java.util.*
 

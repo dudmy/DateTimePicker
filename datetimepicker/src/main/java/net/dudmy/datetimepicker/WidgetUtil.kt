@@ -1,9 +1,9 @@
 package net.dudmy.datetimepicker
 
 import android.graphics.drawable.ColorDrawable
-import android.support.annotation.ColorInt
 import android.util.Log
 import android.widget.NumberPicker
+import androidx.annotation.ColorInt
 
 private const val TAG = "WidgetUtil"
 

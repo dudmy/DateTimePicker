@@ -2,10 +2,10 @@ package net.dudmy.datetimepicker
 
 import android.content.Context
 import android.content.res.Resources
-import android.support.annotation.ColorInt
 import android.util.AttributeSet
 import android.widget.NumberPicker
 import android.widget.TimePicker
+import androidx.annotation.ColorInt
 
 class IntervalTimePicker @JvmOverloads constructor(
     context: Context,
